@@ -8,3 +8,5 @@
 /obj
 /appsettings.Development.json
 *.user
+/Properties/PublishProfiles
+/.config
