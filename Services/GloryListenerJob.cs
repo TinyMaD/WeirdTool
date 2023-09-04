@@ -4,6 +4,7 @@ using PuppeteerSharp;
 using PuppeteerSharp.BrowserData;
 using System.Net.Mail;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace WeridTool.Services
 {
@@ -106,17 +107,17 @@ namespace WeridTool.Services
                 }
             }
             string title = await page.GetTitleAsync();
-            string msg = $"{keyword}；活动标题：{title}；";
-            //string pattern = $"{keyword}.*?<span[^>]*>(.*?)活动时间";
+            string msg = $"{keyword}<br/><br/>活动标题：{title}<br/><br/>";
 
-            //Match match = Regex.Match(html, pattern);
-            //if (match.Success)
-            //{
-            //    string spanContent = match.Value;
-            //    // 提取活动时间文本内容
-            //    string text = Regex.Replace(spanContent, "<.*?>", string.Empty);
-            //    msg += text;
-            //}
+            string pattern = $@"(?<={keyword}[\s\S]*span[^>]*>).*活动时间.*(?=</span>)";
+
+            Match match = Regex.Match(html, pattern);
+            if (match.Success)
+            {
+                // 提取活动时间
+                string ActTime = match.Value;
+                msg += ActTime + "<br/><br/>";
+            }
 
             return (true, msg);
         }
