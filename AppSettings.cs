@@ -1,9 +1,9 @@
 ﻿namespace WeridTool
 {
-    public class AppSettings
+    public static class AppSettings
     {
         private static IConfiguration _configuration;
-        public AppSettings(IConfiguration configuration)
+        public static void SetConfiguration(IConfiguration configuration)
         {
             _configuration = configuration;
         }

@@ -47,7 +47,7 @@ namespace WeridTool.Services
             {
                 return;
             }
-            MailMessage mailMsg = new("", "supremelang@qq.com")
+            MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
             {
                 Subject = "王者荣耀充值活动",//邮件主题  
                 IsBodyHtml = true,

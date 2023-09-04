@@ -4,12 +4,14 @@ using WeridTool;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
 // Add services to the container.
-Scheduler.Initialize();
-// 注册全局Configuration
-builder.Services.AddSingleton<AppSettings>();
 
 WebApplication app = builder.Build();
+
+// 注册全局Configuration
+AppSettings.SetConfiguration(app.Configuration);
+Scheduler.Initialize();
 
 // Configure the HTTP request pipeline.
 
