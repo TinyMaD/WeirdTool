@@ -4,13 +4,50 @@ using PuppeteerSharp;
 using PuppeteerSharp.BrowserData;
 using System.Net.Mail;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace WeridTool.Services
 {
     public class GloryListenerJob : IJob
     {
         public void Execute()
+        {
+            // 获取活动列表
+            List<string> hrefLinks = GetHrefLinks();
+            // 筛选新活动
+            hrefLinks = GetNewAct(hrefLinks);
+
+            if (hrefLinks.Count == 0)
+            {
+                return;
+            }
+            var msg = "";
+            foreach (string href in hrefLinks)
+            {
+                var (isAct, actMsg) = IsRechargeAct(href).Result;
+                // 判断是否是充值活动
+                if (isAct)
+                {
+                    msg += actMsg;
+                }
+            }
+            // 更新活动标记
+            var newestAct = hrefLinks.FirstOrDefault();
+            WriteActFlag(newestAct);
+
+            if (string.IsNullOrWhiteSpace(msg))
+            {
+                return;
+            }
+            MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
+            {
+                Subject = "王者荣耀充值活动",//邮件主题  
+                IsBodyHtml = true,
+                Body = msg//邮件正文  
+            };
+            new Notify().SendEmail(mailMsg);
+        }
+
+        private static List<string> GetHrefLinks()
         {
             // 使用HtmlAgilityPack解析HTML
             HtmlWeb web = new()
@@ -33,30 +70,10 @@ namespace WeridTool.Services
                     hrefLinks.Add(href);
                 }
             }
-
-            var msg = "";
-            foreach (string href in hrefLinks)
-            {
-                var (isAct, actMsg) = IsRechargeAct(href).Result;
-                if (isAct)
-                {
-                    msg += actMsg;
-                }
-            }
-            if (string.IsNullOrWhiteSpace(msg))
-            {
-                return;
-            }
-            MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
-            {
-                Subject = "王者荣耀充值活动",//邮件主题  
-                IsBodyHtml = true,
-                Body = msg//邮件正文  
-            };
-            new Notify().SendEmail(mailMsg);
+            return hrefLinks;
         }
 
-        public async Task<(bool, string)> IsRechargeAct(string href)
+        private static async Task<(bool, string)> IsRechargeAct(string href)
         {
             // 设置Headless Chrome路径
             BrowserFetcher bf = new();
@@ -71,6 +88,8 @@ namespace WeridTool.Services
             using IPage page = await browser.NewPageAsync();
             // 导航到页面
             await page.GoToAsync(href);
+
+            await Task.Delay(5000);// 延迟5秒
 
             // 获取经过JavaScript处理后的HTML内容
             string html = await page.GetContentAsync();
@@ -100,6 +119,32 @@ namespace WeridTool.Services
             //}
 
             return (true, msg);
+        }
+
+        private static List<string> GetNewAct(List<string> hrefLinks)
+        {
+            var lastAct = ReadLastAct();
+
+            var newAct = hrefLinks.TakeWhile(x => x != lastAct).ToList();
+            return newAct;
+        }
+
+        private static string ReadLastAct()
+        {
+            string filePath = AppContext.BaseDirectory + "cursor.txt"; // 文件路径
+
+            if (File.Exists(filePath))
+            {
+                string fileContent = File.ReadAllText(filePath);
+                return fileContent;
+            }
+            return string.Empty;
+        }
+
+        private static void WriteActFlag(string? actFlag)
+        {
+            string filePath = AppContext.BaseDirectory + "cursor.txt"; // 文件路径
+            File.WriteAllText(filePath, actFlag);
         }
     }
 }
