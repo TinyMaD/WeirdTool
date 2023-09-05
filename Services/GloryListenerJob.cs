@@ -1,7 +1,6 @@
 ﻿using FluentScheduler;
 using HtmlAgilityPack;
 using PuppeteerSharp;
-using PuppeteerSharp.BrowserData;
 using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -69,17 +68,10 @@ namespace WeirdTool.Services
 
         private static async Task<string> HasRechargeAct(List<string> hrefLinks)
         {
-            // 设置Headless Chrome路径
-            BrowserFetcher bf = new();
-            IEnumerable<InstalledBrowser> Browsers = bf.GetInstalledBrowsers();
-
-            if (!Browsers.Any())
-            {
-                await bf.DownloadAsync();
-            }
             LaunchOptions options = new()
             {
                 Headless = true,
+                ExecutablePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe",
                 Args = new string[] { "--disable-gpu", "--no-sandbox" }
             };
             using IBrowser browser = await Puppeteer.LaunchAsync(options);

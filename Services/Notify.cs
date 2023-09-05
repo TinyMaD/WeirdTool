@@ -20,7 +20,7 @@ namespace WeirdTool.Services
             msg.From = from;
 
             //实例化SmtpClient  
-            SmtpClient smtpClient = new(smtpHost, 25)
+            SmtpClient smtpClient = new(smtpHost, 587)
             {
                 //设置验证发件人身份的凭据  
                 Credentials = new NetworkCredential(uid, pwd),
