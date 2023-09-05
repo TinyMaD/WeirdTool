@@ -2,7 +2,7 @@
 {
     public static class AppSettings
     {
-        private static IConfiguration _configuration;
+        private static IConfiguration? _configuration;
         public static void SetConfiguration(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -10,7 +10,7 @@
 
         public static string GetConfig(string key)
         {
-            return _configuration?[key];
+            return _configuration?[key]??"";
         }
 
         /// <summary>
@@ -22,9 +22,9 @@
         {
             try
             {
-                if (sections.Any())
+                if (sections.Length != 0)
                 {
-                    return _configuration[string.Join(":", sections)];
+                    return _configuration?[string.Join(":", sections)]??"";
                 }
             }
             catch (Exception) { }
@@ -40,9 +40,9 @@
         /// <returns></returns>
         public static List<T> GetConfig<T>(params string[] sections)
         {
-            List<T> list = new List<T>();
+            List<T> list = new();
             // 引用 Microsoft.Extensions.Configuration.Binder 包
-            _configuration.Bind(string.Join(":", sections), list);
+            _configuration?.Bind(string.Join(":", sections), list);
             return list;
         }
     }

@@ -13,7 +13,7 @@ namespace WeirdTool.Services
         public void SendEmail(MailMessage msg)
         {
             string smtpHost = _smtpHost;
-            string uid = _uid;//发件人邮箱地址@符号前面的字符tom@dddd.com,则为"tom" 
+            string uid = _uid;//发件人邮箱地址
             string pwd = _pwd;//发件人邮箱的密码 
 
             MailAddress from = new(uid, "奇葩工具", Encoding.UTF8);

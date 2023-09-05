@@ -23,21 +23,21 @@ namespace WeirdTool.Services
             // 检查是否有充值活动
             var msg = HasRechargeAct(hrefLinks).Result;
 
-            // 更新活动标记
-            var newestAct = hrefLinks.FirstOrDefault();
-            WriteActFlag(newestAct);
-
             if (string.IsNullOrWhiteSpace(msg))
             {
                 return;
             }
             MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
             {
-                Subject = "王者荣耀充值活动",//邮件主题  
+                Subject = "王者荣耀活动",//邮件主题  
                 IsBodyHtml = true,
                 Body = msg//邮件正文  
             };
             new Notify().SendEmail(mailMsg);
+
+            // 更新活动标记
+            var newestAct = hrefLinks.FirstOrDefault();
+            WriteActFlag(newestAct);
         }
 
         private static List<string> GetHrefLinks()
@@ -100,30 +100,25 @@ namespace WeirdTool.Services
             // 获取经过JavaScript处理后的HTML内容
             string html = await page.GetContentAsync();
 
-            string keyword = "累计充值";
-            var rechargeAct = html.Contains(keyword);
-            if (!rechargeAct)
+            string[] actList = new[] { "累计充值", "每日充值", "积分夺宝打折" };
+
+            string? keyword = actList.FirstOrDefault(html.Contains);
+            if (keyword == null)
             {
-                keyword = "每日充值";
-                rechargeAct = html.Contains(keyword);
-                if (!rechargeAct)
-                {
-                    return (false, "");
-                }
+                return (false, "");
             }
-            string title = await page.GetTitleAsync();
-            string msg = $"{keyword}<br/><br/>活动标题：{title}<br/><br/>";
 
+            string msg = $"【{keyword}】<br/><br/>";
             string pattern = $@"(?<={keyword}[\s\S]*span[^>]*>).*活动时间.*(?=</span>)";
-
             Match match = Regex.Match(html, pattern);
             if (match.Success)
             {
                 // 提取活动时间
-                string ActTime = match.Value;
+                string ActTime = match.Groups[0].Value;
                 msg += ActTime + "<br/><br/>";
             }
-
+            string title = await page.GetTitleAsync();
+            msg += $@"活动链接：<a href=""{href}""  target=""_blank"">{title}</a><br/><br/>";
             return (true, msg);
         }
 
