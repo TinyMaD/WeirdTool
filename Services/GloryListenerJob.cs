@@ -21,16 +21,9 @@ namespace WeridTool.Services
             {
                 return;
             }
-            var msg = "";
-            foreach (string href in hrefLinks)
-            {
-                var (isAct, actMsg) = IsRechargeAct(href).Result;
-                // 判断是否是充值活动
-                if (isAct)
-                {
-                    msg += actMsg;
-                }
-            }
+            // 检查是否有充值活动
+            var msg = HasRechargeAct(hrefLinks).Result;
+
             // 更新活动标记
             var newestAct = hrefLinks.FirstOrDefault();
             WriteActFlag(newestAct);
@@ -74,7 +67,7 @@ namespace WeridTool.Services
             return hrefLinks;
         }
 
-        private static async Task<(bool, string)> IsRechargeAct(string href)
+        private static async Task<string> HasRechargeAct(List<string> hrefLinks)
         {
             // 设置Headless Chrome路径
             BrowserFetcher bf = new();
@@ -84,13 +77,33 @@ namespace WeridTool.Services
             {
                 await bf.DownloadAsync();
             }
-            LaunchOptions options = new() { Headless = true };
+            LaunchOptions options = new()
+            {
+                Headless = true,
+                Args = new string[] { "--disable-gpu", "--no-sandbox" }
+            };
             using IBrowser browser = await Puppeteer.LaunchAsync(options);
             using IPage page = await browser.NewPageAsync();
+
+            string msg = "";
+            foreach (string href in hrefLinks)
+            {
+                var (isAct, actMsg) = await IsRechargeAct(page, href);
+                // 判断是否是充值活动
+                if (isAct)
+                {
+                    msg += actMsg;
+                }
+                await Task.Delay(5000);// 延迟5秒
+            }
+            await browser.CloseAsync();
+            return msg;
+        }
+
+        private static async Task<(bool, string)> IsRechargeAct(IPage page, string href)
+        {
             // 导航到页面
             await page.GoToAsync(href);
-
-            await Task.Delay(5000);// 延迟5秒
 
             // 获取经过JavaScript处理后的HTML内容
             string html = await page.GetContentAsync();
