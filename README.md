@@ -1,1 +1,1 @@
-# WeridTool
+# WeirdTool

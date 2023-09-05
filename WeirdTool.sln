@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34004.107
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeridTool", "WeridTool.csproj", "{6A9E97CE-B2C9-412A-8DB5-5A5AEF9BAFAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeirdTool", "WeirdTool.csproj", "{6A9E97CE-B2C9-412A-8DB5-5A5AEF9BAFAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

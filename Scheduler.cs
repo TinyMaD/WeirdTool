@@ -1,7 +1,7 @@
 ﻿using FluentScheduler;
-using WeridTool.Services;
+using WeirdTool.Services;
 
-namespace WeridTool
+namespace WeirdTool
 {
     public class Scheduler
     {

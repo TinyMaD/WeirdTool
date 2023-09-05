@@ -1,5 +1,5 @@
 using System.Text;
-using WeridTool;
+using WeirdTool;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +9,7 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 WebApplication app = builder.Build();
 
-// ×¢²áÈ«¾ÖConfiguration
+// ×¢ï¿½ï¿½È«ï¿½ï¿½Configuration
 AppSettings.SetConfiguration(app.Configuration);
 Scheduler.Initialize();
 

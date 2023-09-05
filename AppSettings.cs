@@ -1,4 +1,4 @@
-﻿namespace WeridTool
+﻿namespace WeirdTool
 {
     public static class AppSettings
     {

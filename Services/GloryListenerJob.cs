@@ -6,7 +6,7 @@ using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace WeridTool.Services
+namespace WeirdTool.Services
 {
     public class GloryListenerJob : IJob
     {

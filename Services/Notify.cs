@@ -2,7 +2,7 @@
 using System.Net.Mail;
 using System.Text;
 
-namespace WeridTool.Services
+namespace WeirdTool.Services
 {
     public class Notify
     {
