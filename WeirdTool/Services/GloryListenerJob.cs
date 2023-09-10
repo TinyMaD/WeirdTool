@@ -34,6 +34,7 @@ namespace WeirdTool.Services
                 Body = msg//邮件正文  
             };
             new Notify().SendEmail(mailMsg);
+            //_ = new WxApi().SendMsgAsync(msg);
 
             // 更新活动标记
             var newestAct = hrefLinks.FirstOrDefault();
