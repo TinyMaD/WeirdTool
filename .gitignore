@@ -2,11 +2,12 @@
 # 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
 ################################################################################
 
-/appsettings.json
+/WeirdTool/appsettings.json
 /.vs
-/bin
-/obj
-/appsettings.Development.json
-*.user
-/Properties/PublishProfiles
+/WeirdTool/bin
+/WeirdTool/obj
+/WeirdTool/appsettings.Development.json
+/WeirdTool*.user
+/WeirdTool/Properties/PublishProfiles
 /.config
+/WeChatMP/obj
