@@ -20,11 +20,14 @@ namespace WeirdTool.Services
             {
                 return;
             }
+            var newestAct = hrefLinks.FirstOrDefault();
             // 检查是否有充值活动
             var msg = HasRechargeAct(hrefLinks).Result;
 
             if (string.IsNullOrWhiteSpace(msg))
             {
+                // 更新活动标记
+                WriteActFlag(newestAct);
                 return;
             }
             MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
@@ -37,7 +40,6 @@ namespace WeirdTool.Services
             //_ = new WxApi().SendMsgAsync(msg);
 
             // 更新活动标记
-            var newestAct = hrefLinks.FirstOrDefault();
             WriteActFlag(newestAct);
         }
 
