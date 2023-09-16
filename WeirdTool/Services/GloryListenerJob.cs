@@ -103,7 +103,7 @@ namespace WeirdTool.Services
             // 获取经过JavaScript处理后的HTML内容
             string html = await page.GetContentAsync();
 
-            string[] actList = new[] { "累计充值", "每日充值", "积分夺宝打折" };
+            string[] actList = new[] { "累计充值", "每日充值", "积分夺宝打折", "积分暴击" };
 
             string? keyword = actList.FirstOrDefault(html.Contains);
             if (keyword == null)
