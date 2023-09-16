@@ -24,20 +24,17 @@ namespace WeirdTool.Services
             // 检查是否有充值活动
             var msg = HasRechargeAct(hrefLinks).Result;
 
-            if (string.IsNullOrWhiteSpace(msg))
+            if (!string.IsNullOrWhiteSpace(msg))
             {
-                // 更新活动标记
-                WriteActFlag(newestAct);
-                return;
+                MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
+                {
+                    Subject = "王者荣耀活动",//邮件主题  
+                    IsBodyHtml = true,
+                    Body = msg//邮件正文  
+                };
+                new Notify().SendEmail(mailMsg);
+                //_ = new WxApi().SendMsgAsync(msg);
             }
-            MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
-            {
-                Subject = "王者荣耀活动",//邮件主题  
-                IsBodyHtml = true,
-                Body = msg//邮件正文  
-            };
-            new Notify().SendEmail(mailMsg);
-            //_ = new WxApi().SendMsgAsync(msg);
 
             // 更新活动标记
             WriteActFlag(newestAct);
