@@ -109,7 +109,7 @@ namespace WeirdTool.Services
             }
 
             string msg = $"【{keyword}】<br/><br/>";
-            string pattern = $@"(?<={keyword}[\s\S]*span[^>]*>).*活动时间.*(?=</span>)";
+            string pattern = $@"(?<={keyword}[\s\S]*span[^>]*>).*时间：.*(?=</span>)";
             Match match = Regex.Match(html, pattern);
             if (match.Success)
             {
