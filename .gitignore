@@ -4,10 +4,9 @@
 
 /WeirdTool/appsettings.json
 /.vs
-/WeirdTool/bin
-/WeirdTool/obj
+bin
+obj
 /WeirdTool/appsettings.Development.json
-/WeirdTool*.user
+*.user
 /WeirdTool/Properties/PublishProfiles
 /.config
-/WeChatMP/obj
