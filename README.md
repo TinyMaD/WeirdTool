@@ -1,2 +1,6 @@
 # WeirdTool
-ÍõÕßÈÙÒ«³äÖµ»î¶¯ÌáÊ¾¹¤¾ß
+ç‹è€…è£è€€æ¯æ—¥å……å€¼ã€ç´¯è®¡å……å€¼æç¤ºå·¥å…·
+
+`docker build -t weird.tool .`
+
+`docker run -d -e TZ=Asia/Shanghai --name weird-tool --restart=always weird.tool`
