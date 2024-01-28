@@ -11,44 +11,56 @@ namespace WeirdTool.Services
     {
         public void Execute()
         {
-            // 获取活动列表
-            List<string> hrefLinks = GetHrefLinks();
-            // 筛选新活动
-            hrefLinks = GetNewAct(hrefLinks);
-
-            if (hrefLinks.Count == 0)
+            try
             {
-                return;
-            }
-            var newestAct = hrefLinks.FirstOrDefault();
-            // 检查是否有充值活动
-            var msg = HasRechargeAct(hrefLinks).Result;
+                // 获取活动列表
+                List<string> hrefLinks = GetHrefLinks();
+                // 筛选新活动
+                hrefLinks = GetNewAct(hrefLinks);
 
-            if (!string.IsNullOrWhiteSpace(msg))
-            {
-                MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
+                if (hrefLinks.Count == 0)
                 {
-                    Subject = "王者荣耀活动",//邮件主题  
-                    IsBodyHtml = true,
-                    Body = msg//邮件正文  
-                };
-                new Notify().SendEmail(mailMsg);
-                //_ = new WxApi().SendMsgAsync(msg);
-            }
+                    return;
+                }
+                var newestAct = hrefLinks.FirstOrDefault();
+                // 检查是否有充值活动
+                var msg = HasRechargeAct(hrefLinks).Result;
+                Console.WriteLine($"邮件内容：{msg}");
 
-            // 更新活动标记
-            WriteActFlag(newestAct);
+                if (!string.IsNullOrWhiteSpace(msg))
+                {
+                    MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
+                    {
+                        Subject = "王者荣耀活动",//邮件主题  
+                        IsBodyHtml = true,
+                        Body = msg//邮件正文  
+                    };
+                    Console.WriteLine($"开始发送邮件内容...");
+                    new Notify().SendEmail(mailMsg);
+                    //_ = new WxApi().SendMsgAsync(msg);
+                }
+                Console.WriteLine($"发送邮件成功，更新游标...");
+                // 更新活动标记
+                WriteActFlag(newestAct);
+                Console.WriteLine($"更新游标成功");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
         }
 
         private static List<string> GetHrefLinks()
         {
+            Console.WriteLine("获取活动页面");
             // 使用HtmlAgilityPack解析HTML
             HtmlWeb web = new()
             {
                 OverrideEncoding = Encoding.GetEncoding("gbk")
             };
             HtmlDocument doc = web.Load("https://pvp.qq.com/web201706/newsindex.shtml");
-
+            Console.WriteLine("获取成功");
             // 获取指定h2标签下的所有li标签
             HtmlNodeCollection h2Nodes = doc.DocumentNode.SelectNodes("//h2[text()='活动']/following-sibling::ul[1]/li");
 
@@ -63,19 +75,29 @@ namespace WeirdTool.Services
                     hrefLinks.Add(href);
                 }
             }
+            Console.WriteLine(string.Join("\r\n", hrefLinks));
             return hrefLinks;
         }
 
         private static async Task<string> HasRechargeAct(List<string> hrefLinks)
         {
+            Console.WriteLine($"开始下载浏览器...");
+            using var fetcher = new BrowserFetcher();
+            //fetcher.Platform = Platform.Linux;
+            await fetcher.DownloadAsync();
+            Console.WriteLine($"下载完成");
             LaunchOptions options = new()
             {
                 Headless = true,
-                ExecutablePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                //ExecutablePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                //ExecutablePath = @"Chrome/Linux-115.0.5790.102/chrome-linux64/chrome",
                 Args = new string[] { "--disable-gpu", "--no-sandbox" }
             };
+            Console.WriteLine($"获取浏览器地址：{options.ExecutablePath}");
             using IBrowser browser = await Puppeteer.LaunchAsync(options);
+            Console.WriteLine($"开启浏览器成功，正在打开新页面...");
             using IPage page = await browser.NewPageAsync();
+            Console.WriteLine($"开启新页面成功，正在请求活动页...");
 
             string msg = "";
             foreach (string href in hrefLinks)
@@ -96,10 +118,10 @@ namespace WeirdTool.Services
         {
             // 导航到页面
             await page.GoToAsync(href);
-
+            Console.WriteLine($"活动页请求成功，正在获取HTML内容...");
             // 获取经过JavaScript处理后的HTML内容
             string html = await page.GetContentAsync();
-
+            Console.WriteLine($"获取HTML内容成功");
             string[] actList = new[] { "累计充值", "每日充值", "积分夺宝打折", "积分暴击" };
 
             string? keyword = actList.FirstOrDefault(html.Contains);
@@ -127,18 +149,22 @@ namespace WeirdTool.Services
             var lastAct = ReadLastAct();
 
             var newAct = hrefLinks.TakeWhile(x => x != lastAct).ToList();
+            Console.WriteLine($"共{newAct.Count}个新活动");
             return newAct;
         }
 
         private static string ReadLastAct()
         {
+            Console.WriteLine($"获取cursor.txt");
             string filePath = AppContext.BaseDirectory + "cursor.txt"; // 文件路径
 
             if (File.Exists(filePath))
             {
                 string fileContent = File.ReadAllText(filePath);
+                Console.WriteLine($"存在：{fileContent}");
                 return fileContent;
             }
+            Console.WriteLine($"不存在");
             return string.Empty;
         }
 
