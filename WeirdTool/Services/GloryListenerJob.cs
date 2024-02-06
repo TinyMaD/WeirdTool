@@ -13,11 +13,12 @@ namespace WeirdTool.Services
         {
             try
             {
+                Console.WriteLine($"任务开始...");
                 // 获取活动列表
                 List<string> hrefLinks = GetHrefLinks();
                 // 筛选新活动
                 hrefLinks = GetNewAct(hrefLinks);
-
+                Console.WriteLine($"检查到个{hrefLinks.Count}新活动");
                 if (hrefLinks.Count == 0)
                 {
                     return;
@@ -25,9 +26,10 @@ namespace WeirdTool.Services
                 var newestAct = hrefLinks.FirstOrDefault();
                 // 检查是否有充值活动
                 var msg = HasRechargeAct(hrefLinks).Result;
-
+               
                 if (!string.IsNullOrWhiteSpace(msg))
                 {
+                    Console.WriteLine($"邮件内容：{msg}");
                     MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
                     {
                         Subject = "王者荣耀活动",//邮件主题  
@@ -45,6 +47,7 @@ namespace WeirdTool.Services
                 Console.WriteLine(ex);
                 //throw;
             }
+            Console.WriteLine($"任务结束");
         }
 
         private static List<string> GetHrefLinks()
@@ -76,14 +79,20 @@ namespace WeirdTool.Services
         {
             using var fetcher = new BrowserFetcher();
             //fetcher.Platform = Platform.Linux;
-            await fetcher.DownloadAsync();
+            //await fetcher.DownloadAsync();
             LaunchOptions options = new()
             {
                 Headless = true,
                 //ExecutablePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe",
                 Args = new string[] { "--disable-gpu", "--no-sandbox" }
             };
+            Console.WriteLine("正在打开浏览器...");
             using IBrowser browser = await Puppeteer.LaunchAsync(options);
+            Console.WriteLine("打开浏览器成功");
+            //using IBrowser browser = await Puppeteer.ConnectAsync(new ConnectOptions
+            //{
+            //     BrowserWSEndpoint = "ws://speedrunners.cn:3000"
+            //});
             using IPage page = await browser.NewPageAsync();
 
             string msg = "";
@@ -107,7 +116,7 @@ namespace WeirdTool.Services
             await page.GoToAsync(href);
             // 获取经过JavaScript处理后的HTML内容
             string html = await page.GetContentAsync();
-            string[] actList = new[] { "累计充值", "每日充值", "积分夺宝打折", "积分暴击" };
+            string[] actList = ["累计充值", "每日充值", "积分夺宝打折", "积分暴击"];
 
             string? keyword = actList.FirstOrDefault(html.Contains);
             if (keyword == null)
