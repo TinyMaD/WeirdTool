@@ -1,6 +1,6 @@
 ﻿using FluentScheduler;
 using HtmlAgilityPack;
-using PuppeteerSharp;
+using Newtonsoft.Json.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,18 +18,18 @@ namespace WeirdTool.Services
                 List<string> hrefLinks = GetHrefLinks();
                 // 筛选新活动
                 hrefLinks = GetNewAct(hrefLinks);
-                Console.WriteLine($"检查到个{hrefLinks.Count}新活动");
                 if (hrefLinks.Count == 0)
                 {
+                    Console.WriteLine("没有新活动");
                     return;
                 }
-                var newestAct = hrefLinks.FirstOrDefault();
+                hrefLinks.ForEach(link => Console.WriteLine($"新活动：{link}"));
+                string? newestAct = hrefLinks.FirstOrDefault();
                 // 检查是否有充值活动
-                var msg = HasRechargeAct(hrefLinks).Result;
-               
+                string msg = HasRechargeAct(hrefLinks).Result;
+
                 if (!string.IsNullOrWhiteSpace(msg))
                 {
-                    Console.WriteLine($"邮件内容：{msg}");
                     MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
                     {
                         Subject = "王者荣耀活动",//邮件主题  
@@ -61,7 +61,7 @@ namespace WeirdTool.Services
             // 获取指定h2标签下的所有li标签
             HtmlNodeCollection h2Nodes = doc.DocumentNode.SelectNodes("//h2[text()='活动']/following-sibling::ul[1]/li");
 
-            List<string> hrefLinks = new();
+            List<string> hrefLinks = [];
             // 遍历li标签，获取href属性中的链接字符串
             if (h2Nodes != null)
             {
@@ -77,28 +77,10 @@ namespace WeirdTool.Services
 
         private static async Task<string> HasRechargeAct(List<string> hrefLinks)
         {
-            using var fetcher = new BrowserFetcher();
-            //fetcher.Platform = Platform.Linux;
-            //await fetcher.DownloadAsync();
-            LaunchOptions options = new()
-            {
-                Headless = true,
-                //ExecutablePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe",
-                Args = new string[] { "--disable-gpu", "--no-sandbox" }
-            };
-            Console.WriteLine("正在打开浏览器...");
-            using IBrowser browser = await Puppeteer.LaunchAsync(options);
-            Console.WriteLine("打开浏览器成功");
-            //using IBrowser browser = await Puppeteer.ConnectAsync(new ConnectOptions
-            //{
-            //     BrowserWSEndpoint = "ws://speedrunners.cn:3000"
-            //});
-            using IPage page = await browser.NewPageAsync();
-
             string msg = "";
             foreach (string href in hrefLinks)
             {
-                var (isAct, actMsg) = await IsRechargeAct(page, href);
+                (bool isAct, string actMsg) = await IsRechargeAct(href);
                 // 判断是否是充值活动
                 if (isAct)
                 {
@@ -106,43 +88,66 @@ namespace WeirdTool.Services
                 }
                 await Task.Delay(5000);// 延迟5秒
             }
-            await browser.CloseAsync();
             return msg;
         }
 
-        private static async Task<(bool, string)> IsRechargeAct(IPage page, string href)
+        private static async Task<(bool, string)> IsRechargeAct(string href)
         {
-            // 导航到页面
-            await page.GoToAsync(href);
-            // 获取经过JavaScript处理后的HTML内容
-            string html = await page.GetContentAsync();
-            string[] actList = ["累计充值", "每日充值", "积分夺宝打折", "积分暴击"];
+            // 获取tid
+            string pattern = @"[?&]tid=(\d+)";
+            Match match = Regex.Match(href, pattern);
+            string tid = match.Groups[1].Value;
+            // 请求活动页面
+            using HttpClient client = new();
+            HttpResponseMessage response = await client.GetAsync($"https://apps.game.qq.com/wmp/v3.1/public/searchNews.php?p0=18&source=web_pc&id={tid}");
+            string result = await response.Content.ReadAsStringAsync();
 
-            string? keyword = actList.FirstOrDefault(html.Contains);
-            if (keyword == null)
+            string jsonString = result.Replace("var searchObj=", "").TrimEnd(';');
+            // 解析JSON字符串
+            JObject jsonObject = JObject.Parse(jsonString);
+            if (jsonObject is null)
             {
                 return (false, "");
             }
 
-            string msg = $"【{keyword}】<br/><br/>";
-            string pattern = $@"(?<={keyword}[\s\S]*span[^>]*>).*时间：.*(?=</span>)";
-            Match match = Regex.Match(html, pattern);
-            if (match.Success)
+            // 获取html内容
+            string content = jsonObject["msg"]["sContent"].ToString();
+
+            string[] actList = ["累计充值", "每日充值", "积分夺宝", "积分暴击"];
+
+            IEnumerable<string>? keywords = actList.Where(content.Contains);
+            if (!keywords?.Any() ?? true)
             {
-                // 提取活动时间
-                string ActTime = match.Groups[0].Value;
-                msg += ActTime + "<br/><br/>";
+                return (false, "");
             }
-            string title = await page.GetTitleAsync();
-            msg += $@"活动链接：<a href=""{href}""  target=""_blank"">{title}</a><br/><br/>";
+
+            string msg = "";
+            foreach (string? keyword in keywords)
+            {
+                string pattern2 = $@"(?<={keyword}[\s\S]*span[^>]*>)活动时间：[^/]*(?=</span>)";
+                Match match2 = Regex.Match(content, pattern2);
+                if (match2.Success)
+                {
+                    msg += $"<h2><strong>【{keyword}】</strong></h2>";
+                    // 提取活动时间
+                    string ActTime = match2.Groups[0].Value;
+                    msg += $"<h2><strong>{ActTime}</strong></h2>";
+                    Console.WriteLine($"【{keyword}】{ActTime}");
+                }
+                else
+                {
+                    msg += $"<h2><strong>【{keyword}】相关活动</strong></h2>";
+                }
+            }
+            msg += content;
             return (true, msg);
         }
 
         private static List<string> GetNewAct(List<string> hrefLinks)
         {
-            var lastAct = ReadLastAct();
+            string lastAct = ReadLastAct();
 
-            var newAct = hrefLinks.TakeWhile(x => x != lastAct).ToList();
+            List<string> newAct = hrefLinks.TakeWhile(x => x != lastAct).ToList();
             return newAct;
         }
 

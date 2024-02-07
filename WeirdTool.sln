@@ -5,9 +5,11 @@ VisualStudioVersion = 17.8.34004.107
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{21EE078B-7C9E-40F6-A63E-0963E1F98CE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeChatMP", "WeChatMP\WeChatMP.csproj", "{D31D4FA7-DFDD-45D9-A19C-4DB8746EEBCA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeChatMP", "WeChatMP\WeChatMP.csproj", "{D31D4FA7-DFDD-45D9-A19C-4DB8746EEBCA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeirdTool", "WeirdTool\WeirdTool.csproj", "{3D1A14E8-3893-4E5C-8463-4EC7AF7EE83E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PuppeteerTool", "Puppeteer\PuppeteerTool.csproj", "{C3FC4DAA-8D36-4C9A-AC0D-90FCC8AED14D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{3D1A14E8-3893-4E5C-8463-4EC7AF7EE83E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D1A14E8-3893-4E5C-8463-4EC7AF7EE83E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D1A14E8-3893-4E5C-8463-4EC7AF7EE83E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3FC4DAA-8D36-4C9A-AC0D-90FCC8AED14D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3FC4DAA-8D36-4C9A-AC0D-90FCC8AED14D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3FC4DAA-8D36-4C9A-AC0D-90FCC8AED14D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3FC4DAA-8D36-4C9A-AC0D-90FCC8AED14D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
