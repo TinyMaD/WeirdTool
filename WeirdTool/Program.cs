@@ -1,3 +1,9 @@
+//using Senparc.Weixin;
+//using Senparc.Weixin.AspNet;
+//using Senparc.Weixin.MP;
+//using Senparc.Weixin.MP.MessageHandlers.Middleware;
+//using Senparc.Weixin.RegisterServices;
+//using WeChatMP;
 using System.Text;
 using WeirdTool;
 
@@ -12,7 +18,7 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 WebApplication app = builder.Build();
 
 ////启用微信配置（必须）
-//var registerService = app.UseSenparcWeixin(app.Environment,
+//Senparc.CO2NET.RegisterServices.IRegisterService registerService = app.UseSenparcWeixin(app.Environment,
 //    null /* 不为 null 则覆盖 appsettings  中的 SenpacSetting 配置*/,
 //    null /* 不为 null 则覆盖 appsettings  中的 SenpacWeixinSetting 配置*/,
 //    register => { /* CO2NET 全局配置 */ },
@@ -28,7 +34,7 @@ Scheduler.Initialize();
 
 // Configure the HTTP request pipeline.
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 //app.UseMessageHandlerForMp("/wxmp", CustomMessageHandler.GenerateMessageHandler, options =>
 //{
@@ -40,7 +46,7 @@ app.UseHttpsRedirection();
 //});
 //app.MapGet("/wxmp/test", async () =>
 //{
-//   await new WxApi().Test();
+//    await new WxApi().Test();
 //});
 
 app.Run();

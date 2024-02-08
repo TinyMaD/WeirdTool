@@ -1,4 +1,5 @@
-﻿using FluentScheduler;
+﻿//using WeChatMP;
+using FluentScheduler;
 using HtmlAgilityPack;
 using Newtonsoft.Json.Linq;
 using System.Net.Mail;

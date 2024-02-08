@@ -2,7 +2,6 @@
 # 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
 ################################################################################
 
-/WeirdTool/appsettings.json
 /.vs
 bin
 obj
@@ -10,3 +9,5 @@ obj
 *.user
 /WeirdTool/Properties/PublishProfiles
 /.config
+/WeirdTool/appsettings.Development.json
+/WeirdTool/appsettings.Production.json

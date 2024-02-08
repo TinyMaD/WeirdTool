@@ -4,11 +4,30 @@ using Senparc.Weixin.MP.AdvancedAPIs;
 using Senparc.Weixin.MP.CommonAPIs;
 using Senparc.Weixin.MP.Entities.Menu;
 
-namespace WeirdTool.Services
+namespace WeChatMP
 {
     public class WxApi
     {
         readonly static string _appId = Senparc.Weixin.Config.SenparcWeixinSetting.MpSetting.WeixinAppId;
+
+        public async Task SendMsgAsync(string msg)
+        {
+            string tagName = "订阅农药";
+            var tags = await UserTagApi.GetAsync(_appId);
+            var tag = tags.tags.FirstOrDefault(x => x.name == tagName);
+            if (tag == null)
+            {
+                return;
+            }
+            int tagID = tag?.id ?? 0;
+            var result = await GroupMessageApi.SendGroupMessageByTagIdAsync(_appId, tagID.ToString(), msg, GroupMessageType.text);
+        }
+
+        public async Task Test()
+        {
+            var result = await GroupMessageApi.SendGroupMessageByTagIdAsync(_appId, "100", "【每日充值】\r\n 活动时间：9月8日0:00-9月11日23:59 \r\n 活动链接：https://pvp.qq.com/web201706/newsdetail.shtml?tid=606470", GroupMessageType.text);
+        }
+
         public string RefreshMenu()
         {
             ButtonGroup bg = new ButtonGroup();
@@ -43,24 +62,6 @@ namespace WeirdTool.Services
                 result += JsonConvert.SerializeObject(ex);
             }
             return result;
-        }
-
-        public async Task SendMsgAsync(string msg)
-        {
-            string tagName = "订阅农药";
-            var tags = await UserTagApi.GetAsync(_appId);
-            var tag = tags.tags.FirstOrDefault(x => x.name == tagName);
-            if (tag == null)
-            {
-                return;
-            }
-            int tagID = tag?.id ?? 0;
-            var result = await GroupMessageApi.SendGroupMessageByTagIdAsync(_appId, tagID.ToString(), msg, GroupMessageType.text);
-        }
-
-        public async Task Test()
-        {
-            var result = await GroupMessageApi.SendGroupMessageByTagIdAsync(_appId, "100", "【每日充值】\r\n 活动时间：9月8日0:00-9月11日23:59 \r\n 活动链接：https://pvp.qq.com/web201706/newsdetail.shtml?tid=606470", GroupMessageType.text);
         }
     }
 }

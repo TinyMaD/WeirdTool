@@ -5,7 +5,7 @@ using Senparc.Weixin.MP.Entities.Request;
 using Senparc.Weixin.MP.MessageContexts;
 using Senparc.Weixin.MP.MessageHandlers;
 
-namespace WeirdTool.Services
+namespace WeChatMP
 {
     public class CustomMessageHandler : MessageHandler<DefaultMpMessageContext>
     {
