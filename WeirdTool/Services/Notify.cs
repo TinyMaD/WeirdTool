@@ -6,27 +6,30 @@ namespace WeirdTool.Services
 {
     public class Notify
     {
-        private static readonly string _smtpHost = AppSettings.GetConfig("SmtpHost");
-        private static readonly string _uid = AppSettings.GetConfig("Uid");
-        private static readonly string _pwd = AppSettings.GetConfig("Pwd");
+        private static readonly string _smtpHost = Environment.GetEnvironmentVariable("smtp_host") ?? AppSettings.GetConfig("SmtpHost");
+        private static readonly string _uid = Environment.GetEnvironmentVariable("uid") ?? AppSettings.GetConfig("Uid");
+        private static readonly string _pwd = Environment.GetEnvironmentVariable("pwd") ?? AppSettings.GetConfig("Pwd");
+        private static readonly string _email = Environment.GetEnvironmentVariable("email") ?? AppSettings.GetConfig("Email");
 
-        public void SendEmail(MailMessage msg)
+        public void SendEmail(string msg)
         {
-            string smtpHost = _smtpHost;
-            string uid = _uid;//发件人邮箱地址
-            string pwd = _pwd;//发件人邮箱的密码 
-
-            MailAddress from = new(uid, "奇葩工具", Encoding.UTF8);
-            msg.From = from;
+            MailMessage mailMsg = new(_uid, _email)
+            {
+                Subject = "王者荣耀活动",//邮件主题  
+                IsBodyHtml = true,
+                Body = msg//邮件正文  
+            };
+            MailAddress from = new(_uid, "奇葩工具", Encoding.UTF8);
+            mailMsg.From = from;
 
             //实例化SmtpClient  
-            SmtpClient smtpClient = new(smtpHost, 587)
+            SmtpClient smtpClient = new(_smtpHost, 587)
             {
                 //设置验证发件人身份的凭据  
-                Credentials = new NetworkCredential(uid, pwd),
+                Credentials = new NetworkCredential(_uid, _pwd),
             };
             //发送  
-            smtpClient.Send(msg);
+            smtpClient.Send(mailMsg);
         }
     }
 }

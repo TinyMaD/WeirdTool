@@ -2,7 +2,6 @@
 using FluentScheduler;
 using HtmlAgilityPack;
 using Newtonsoft.Json.Linq;
-using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -12,42 +11,29 @@ namespace WeirdTool.Services
     {
         public void Execute()
         {
-            try
+            Console.WriteLine($"任务开始...");
+            // 获取活动列表
+            List<string> hrefLinks = GetHrefLinks();
+            // 筛选新活动
+            hrefLinks = GetNewAct(hrefLinks);
+            if (hrefLinks.Count == 0)
             {
-                Console.WriteLine($"任务开始...");
-                // 获取活动列表
-                List<string> hrefLinks = GetHrefLinks();
-                // 筛选新活动
-                hrefLinks = GetNewAct(hrefLinks);
-                if (hrefLinks.Count == 0)
-                {
-                    Console.WriteLine("没有新活动");
-                    return;
-                }
-                hrefLinks.ForEach(link => Console.WriteLine($"新活动：{link}"));
-                string? newestAct = hrefLinks.FirstOrDefault();
-                // 检查是否有充值活动
-                string msg = HasRechargeAct(hrefLinks).Result;
+                Console.WriteLine("没有新活动");
+                return;
+            }
+            hrefLinks.ForEach(link => Console.WriteLine($"新活动：{link}"));
+            string? newestAct = hrefLinks.FirstOrDefault();
+            // 检查是否有充值活动
+            string msg = HasRechargeAct(hrefLinks).Result;
 
-                if (!string.IsNullOrWhiteSpace(msg))
-                {
-                    MailMessage mailMsg = new("placeholder@value.com", "supremelang@qq.com")
-                    {
-                        Subject = "王者荣耀活动",//邮件主题  
-                        IsBodyHtml = true,
-                        Body = msg//邮件正文  
-                    };
-                    new Notify().SendEmail(mailMsg);
-                    //_ = new WxApi().SendMsgAsync(msg);
-                }
-                // 更新活动标记
-                WriteActFlag(newestAct);
-            }
-            catch (Exception ex)
+            if (!string.IsNullOrWhiteSpace(msg))
             {
-                Console.WriteLine(ex);
-                //throw;
+                new Notify().SendEmail(msg);
+                //_ = new WxApi().SendMsgAsync(msg);
             }
+            // 更新活动标记
+            WriteActFlag(newestAct);
+
             Console.WriteLine($"任务结束");
         }
 
