@@ -46,7 +46,10 @@ namespace WeirdTool.Services
             };
             HtmlDocument doc = web.Load("https://pvp.qq.com/web201706/newsindex.shtml");
             // 获取指定h2标签下的所有li标签
-            HtmlNodeCollection h2Nodes = doc.DocumentNode.SelectNodes("//h2[text()='活动']/following-sibling::ul[1]/li");
+            HtmlNodeCollection h2Nodes1 = doc.DocumentNode.SelectNodes("//h2[text()='热门']/following-sibling::ul[1]/li");
+            HtmlNodeCollection h2Nodes2 = doc.DocumentNode.SelectNodes("//h2[text()='活动']/following-sibling::ul[1]/li");
+
+            var h2Nodes = h2Nodes1.Concat(h2Nodes2);
 
             List<string> hrefLinks = [];
             // 遍历li标签，获取href属性中的链接字符串
