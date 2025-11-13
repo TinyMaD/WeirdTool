@@ -62,6 +62,11 @@ namespace WeirdTool.Services
                     hrefLinks.Add(href);
                 }
             }
+            hrefLinks = hrefLinks.OrderByDescending(url =>
+            {
+                var tidPart = url.Split("tid=").LastOrDefault();
+                return long.TryParse(tidPart, out var tid) ? tid : 0;
+            }).ToList();
             return hrefLinks;
         }
 
