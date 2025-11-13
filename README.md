@@ -11,7 +11,7 @@
 
 ## Docker 一键部署
 ```Shell
-docker run -d -e smtp_host=发件箱smtp服务器地址 -e uid=发件箱地址 -e pwd=SMTP授权码 -e email=收件箱地址 -e TZ=Asia/Shanghai --name weird-tool --restart=always duckergoder/weird-tool:1.0.0
+docker run -d -e smtp_host=发件箱smtp服务器地址 -e uid=发件箱地址 -e pwd=SMTP授权码 -e email=收件箱地址 -e TZ=Asia/Shanghai --name weird-tool --restart=always duckergoder/weird-tool:latest
 ```
 | 环境变量 | 说明 |
 | :----: | :---- |
